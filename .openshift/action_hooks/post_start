@@ -1,0 +1,12 @@
+#!/bin/sh
+
+mkdir -p "${OPENSHIFT_DATA_DIR}/run/"
+mkdir -p "${OPENSHIFT_LOG_DIR}"
+
+sentry --config="${OPENSHIFT_REPO_DIR}/default.conf" \
+    celery worker -B \
+    -s "${OPENSHIFT_DATA_DIR}/run/celery-schedule" \
+    --pidfile="${OPENSHIFT_DATA_DIR}/run/celery.pid" \
+    --logfile="${OPENSHIFT_LOG_DIR}/sentry-celery.log" \
+    2>&1 >>"${OPENSHIFT_LOG_DIR}/sentry-celery.log" &
+    
