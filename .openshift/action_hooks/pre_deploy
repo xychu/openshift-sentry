@@ -1,5 +1,5 @@
 #!/bin/sh
 
 cd "${OPENSHIFT_REPO_DIR}"
-sentry --config=default.conf upgrade
-python configure.py default.conf
+sentry --config=sentry.conf.py upgrade
+python configure.py sentry.conf.py

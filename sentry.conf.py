@@ -3,10 +3,8 @@
 # you can inherit and tweak settings to your hearts content.
 from sentry.conf.server import *
 
-import os.path
 import os
 
-CONF_ROOT = os.path.dirname(__file__)
 
 DATABASES = {
     'default': {
@@ -16,13 +14,13 @@ DATABASES = {
 
         # If you change this, you'll also need to install the appropriate python
         # package: psycopg2 (Postgres) or mysql-python
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': os.path.join(os.environ.get('OPENSHIFT_DATA_DIR') or CONF_ROOT, 'sentry.db'),
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'sentry',
+        'USER': os.environ.get('OPENSHIFT_POSTGRESQL_DB_USERNAME'),
+        'PASSWORD': os.environ.get('OPENSHIFT_POSTGRESQL_DB_PASSWORD'),
+        'HOST': os.environ.get('OPENSHIFT_POSTGRESQL_DB_HOST'),
+        'PORT': os.environ.get('OPENSHIFT_POSTGRESQL_DB_PORT')
     }
 }
 
@@ -33,16 +31,26 @@ SENTRY_USE_BIG_INTS = True
 # If you're expecting any kind of real traffic on Sentry, we highly recommend
 # configuring the CACHES and Redis settings
 
+#############
+## General ##
+#############
+
+# The administrative email for this installation.
+# Note: This will be reported back to getsentry.com as the point of contact. See
+# the beacon documentation for more information.
+
+# SENTRY_ADMIN_EMAIL = 'your.name@example.com'
+SENTRY_ADMIN_EMAIL = ''
+
 ###########
 ## Redis ##
 ###########
 
 # Generic Redis configuration used as defaults for various things including:
 # Buffers, Quotas, TSDB
-
-redis_host = os.environ.get('OPENSHIFT_REDIS_HOST') or '127.0.0.1'
-redis_port = os.environ.get('OPENSHIFT_REDIS_PORT') or '6379'
-redis_password = os.environ.get('REDIS_PASSWORD') or ''
+redis_host = os.environ.get('OPENSHIFT_REDIS_DB_HOST') or '127.0.0.1'
+redis_port = os.environ.get('OPENSHIFT_REDIS_DB_PORT') or '6379'
+redis_password = os.environ.get('OPENSHIFT_REDIS_DB_PASSWORD') or ''
 
 SENTRY_REDIS_OPTIONS = {
     'hosts': {
@@ -140,9 +148,8 @@ SENTRY_FILESTORE_OPTIONS = {
 SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX') or 'http://sentry.example.com'  # No trailing slash!
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
-# and X-Forwarded-Host headers, and uncomment the following settings
+# header and uncomment the following settings
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# USE_X_FORWARDED_HOST = True
 
 SENTRY_WEB_HOST = '0.0.0.0'
 SENTRY_WEB_PORT = 9000
@@ -160,7 +167,6 @@ SENTRY_WEB_OPTIONS = {
 #  https://docs.djangoproject.com/en/1.3/topics/email/?from=olddocs#e-mail-backends
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST') or 'localhost'
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD') or ''
@@ -172,16 +178,21 @@ EMAIL_USE_TLS = (os.environ.get('EMAIL_USE_TLS') or 'False') == 'True'
 SERVER_EMAIL = os.environ.get('SERVER_EMAIL') or 'root@localhost'
 DEFAULT_FROM_EMAIL = SERVER_EMAIL
 
+# If you're using mailgun for inbound mail, set your API key and configure a
+# route to forward to /api/hooks/mailgun/inbound/
+MAILGUN_API_KEY = ''
+
 ###########
 ## etc. ##
 ###########
 
 # Users can only be invited
+# SENTRY_FEATURES['auth:register'] = False  # used for sentry v7.4.0
 SENTRY_ALLOW_REGISTRATION = False
 
 # If this file ever becomes compromised, it's important to regenerate your SECRET_KEY
 # Changing this value will result in all current sessions being invalidated
-SECRET_KEY = os.environ.get('SECRET_KEY') or os.environ.get('OPENSHIFT_SECRET_TOKEN') or 'gutGShoZ7l17VZeq/uWDOLVDOpqp5YIvN6J4eCgcM+1GjpUL3VlDDw=='
+SECRET_KEY = os.environ.get('SECRET_KEY') or os.environ.get('OPENSHIFT_SECRET_TOKEN') or 'PmXIfTndRubS+6mhogzZ9wNvbF/mnUgSSBR7VmeYf9pdep5E6C5+8g=='
 
 # http://twitter.com/apps/new
 # It's important that input a callback URL, even if its useless. We have no idea why, consult Twitter.
