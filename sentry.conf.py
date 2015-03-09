@@ -4,7 +4,7 @@
 from sentry.conf.server import *
 
 import os
-import sockets
+import socket
 
 
 DATABASES = {
@@ -148,7 +148,7 @@ SENTRY_FILESTORE_OPTIONS = {
 # NOTE: this is needed when using scaled gears in OpenShift
 ALLOWED_HOSTS = [
     os.environ.get('OPENSHIFT_GEAR_DNS'),
-    sockets.gethostname()
+    socket.gethostname(),
 ]
 
 # You MUST configure the absolute URI root for Sentry:
