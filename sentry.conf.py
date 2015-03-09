@@ -146,6 +146,9 @@ SENTRY_FILESTORE_OPTIONS = {
 
 # You MUST configure the absolute URI root for Sentry:
 SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX') or 'https://' + os.environ.get('OPENSHIFT_GEAR_DNS') # No trailing slash!
+ALLOWED_HOSTS = [
+    os.environ.get('OPENSHIFT_GEAR_DNS')
+]
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
 # header and uncomment the following settings
