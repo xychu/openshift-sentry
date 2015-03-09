@@ -4,6 +4,7 @@
 from sentry.conf.server import *
 
 import os
+import sockets
 
 
 DATABASES = {
@@ -144,9 +145,14 @@ SENTRY_FILESTORE_OPTIONS = {
 ## Web Server ##
 ################
 
+# NOTE: this is needed when using scaled gears in OpenShift
+ALLOWED_HOSTS = [
+    os.environ.get('OPENSHIFT_GEAR_DNS'),
+    sockets.gethostname()
+]
+
 # You MUST configure the absolute URI root for Sentry:
 SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX') or 'https://' + os.environ.get('OPENSHIFT_GEAR_DNS') # No trailing slash!
-ALLOWED_HOSTS = ['*']
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
 # header and uncomment the following settings
