@@ -4,6 +4,7 @@
 from sentry.conf.server import *
 
 import os
+import socket
 
 
 DATABASES = {
@@ -40,7 +41,7 @@ SENTRY_USE_BIG_INTS = True
 # the beacon documentation for more information.
 
 # SENTRY_ADMIN_EMAIL = 'your.name@example.com'
-SENTRY_ADMIN_EMAIL = ''
+# SENTRY_ADMIN_EMAIL = ''
 
 ###########
 ## Redis ##
@@ -144,8 +145,14 @@ SENTRY_FILESTORE_OPTIONS = {
 ## Web Server ##
 ################
 
+# NOTE: this is needed when using scaled gears in OpenShift
+ALLOWED_HOSTS = [
+    os.environ.get('OPENSHIFT_GEAR_DNS'),
+    socket.gethostname(),
+]
+
 # You MUST configure the absolute URI root for Sentry:
-SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX') or 'http://sentry.example.com'  # No trailing slash!
+SENTRY_URL_PREFIX = os.environ.get('SENTRY_URL_PREFIX') or 'https://' + os.environ.get('OPENSHIFT_GEAR_DNS') # No trailing slash!
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
 # header and uncomment the following settings

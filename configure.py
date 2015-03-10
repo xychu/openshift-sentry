@@ -14,5 +14,6 @@ if User.objects.filter(username = user.username).exists():
 else:
 	user.email = 'admin@localhost'
 	user.is_superuser = True
+	user.is_staff = True
 	user.set_password('admin')
 	user.save()
